@@ -1,6 +1,5 @@
-import pytest
 from main import BooksCollector
-from data import BOOKS
+
 
 # класс TestBooksCollector объединяет набор тестов, которыми мы покрываем наше приложение BooksCollector
 # обязательно указывать префикс Test
@@ -41,18 +40,33 @@ class TestBooksCollector:
         books_collector.set_book_genre('ОНО', 'Ужасы')
         assert books_collector.get_book_genre('ОНО') == 'Ужасы'
 
-    def test_get_books_with_specific_genre_comedy(self, setup_books):
-        assert setup_books.get_books_with_specific_genre('Комедия') == [
+    def test_get_books_with_specific_genre_comedy(self, books_collector):
+        books_collector.add_new_book('Ревизор')
+        books_collector.add_new_book('Горе от ума')
+        books_collector.add_new_book('Трое в лодке, не считая собаки')
+
+        books_collector.set_book_genre ('Ревизор','Комедия')
+        books_collector.set_book_genre ('Горе от ума', 'Комедия')
+        books_collector.set_book_genre ('Трое в лодке, не считая собаки', 'Комедия')
+
+        assert books_collector.get_books_with_specific_genre('Комедия') == [
             'Ревизор',
             'Горе от ума',
             'Трое в лодке, не считая собаки'
         ]
 
     def test_get_books_genre_empty_list(self, books_collector):
+        books_collector.add_new_book('Книга без жанра')
         assert books_collector.get_books_genre() == {}
 
-    def test_get_books_for_children_return_books_with_age_rating(self, setup_books):
-        assert setup_books.get_books_for_children() == ['Гарри Поттер и философский камень', 'Винни Пух и все-все-все']
+    def test_get_books_for_children_return_books_with_age_rating(self, books_collector):
+        books_collector.add_new_book('Гарри Поттер и философский камень')
+        books_collector.add_new_book('Винни Пух и все-все-все')
+
+        books_collector.set_book_genre('Гарри Поттер и философский камень', 'Фэнтези')
+        books_collector.set_book_genre('Винни Пух и все-все-все', 'Мультфильм')
+
+        assert books_collector.get_books_for_children() == ['Гарри Поттер и философский камень', 'Винни Пух и все-все-все']
 
     def test_add_book_in_favorites_valid_added(self, books_collector):
         books_collector.add_new_book('1984')
@@ -66,7 +80,6 @@ class TestBooksCollector:
     def test_delete_book_from_favorites_exist_book(self, books_collector):
         books_collector.add_new_book('1984')
         books_collector.add_book_in_favorites('1984')
-        assert '1984' in books_collector.get_list_of_favorites_books()
         books_collector.delete_book_from_favorites('1984')
         assert '1984' not in books_collector.get_list_of_favorites_books()
 
